@@ -28,6 +28,14 @@ cd Aukronome
 dotnet run --project src/Aukronome.App
 ```
 
+### Option 3: Add to Desktop & Windows Start Menu (Make Searchable)
+To make Aukronome searchable in Windows Search (so you can just press the **Windows key**, type **`Aukronome`**, and hit Enter):
+```powershell
+# In PowerShell:
+.\Create-Shortcuts.ps1
+```
+This script automatically detects the project path, builds the executable if needed, and installs shortcuts on your **Desktop** and inside your **Windows Start Menu Programs folder** with the official logo.
+
 ---
 
 ## User Guide: How to Practice with Aukronome
