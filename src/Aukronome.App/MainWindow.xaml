@@ -1,0 +1,830 @@
+<Window x:Class="Aukronome.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:Aukronome.Core.Models;assembly=Aukronome.Core"
+        xmlns:vm="clr-namespace:Aukronome.App.ViewModels"
+        mc:Ignorable="d"
+        Title="Aukronome // RawBlock Edition"
+        Width="680"
+        Height="860"
+        MinWidth="600"
+        MinHeight="740"
+        Background="{StaticResource RawWhiteBrush}"
+        Foreground="{StaticResource RawBlackBrush}"
+        FontFamily="{StaticResource BodyFont}"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <!-- Header -->
+            <RowDefinition Height="Auto" />
+            <!-- Main Content Area -->
+            <RowDefinition Height="*" />
+            <!-- Bottom Primary Action & Legend -->
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 0. RAWBLOCK HEADER BAR -->
+        <Border Grid.Row="0"
+                Background="{StaticResource RawWhiteBrush}"
+                BorderBrush="{StaticResource RawBlackBrush}"
+                BorderThickness="3"
+                CornerRadius="0"
+                Padding="14,10"
+                Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="AUKRONOME"
+                               FontFamily="{StaticResource HeadlineFont}"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource RawBlackBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0" />
+
+                    <!-- RawBlock Status Chip -->
+                    <Border BorderThickness="2"
+                            CornerRadius="0"
+                            Padding="8,2"
+                            VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BorderBrush" Value="{StaticResource RawBlackBrush}" />
+                                <Setter Property="Background" Value="{StaticResource RawWhiteBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                        <Setter Property="BorderBrush" Value="{StaticResource RawSuccessBrush}" />
+                                        <Setter Property="Background" Value="{StaticResource RawSuccessBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock FontFamily="{StaticResource MonoFont}"
+                                   FontSize="11"
+                                   FontWeight="Bold">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="■ STOPPED" />
+                                    <Setter Property="Foreground" Value="{StaticResource RawBlackBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                            <Setter Property="Text" Value="▶ PLAYING" />
+                                            <Setter Property="Foreground" Value="{StaticResource RawWhiteBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+
+                <TextBlock Grid.Column="2"
+                           Text="{Binding StatusMessage}"
+                           FontFamily="{StaticResource MonoFont}"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource RawBlackBrush}"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           MaxWidth="260" />
+            </Grid>
+        </Border>
+
+        <!-- MAIN SCROLLABLE CONTENT (HIDDEN SCROLLBAR, ZERO LATENCY SCROLL) -->
+        <ScrollViewer x:Name="MainScrollViewer"
+                      Grid.Row="1"
+                      VerticalScrollBarVisibility="Hidden"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Focusable="False">
+            <StackPanel>
+
+                <!-- 1. LARGE BPM READOUT & STEPPERS (CARD ELEVATED) -->
+                <Border Background="{StaticResource RawWhiteBrush}"
+                        BorderBrush="{StaticResource RawBlackBrush}"
+                        BorderThickness="5"
+                        CornerRadius="0"
+                        Padding="16,14"
+                        Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- BPM Hero Controls -->
+                        <Grid Grid.Row="0" HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0"
+                                    Content="−10"
+                                    Width="66" Height="48"
+                                    Padding="0"
+                                    Margin="0,0,8,0"
+                                    Command="{Binding AdjustBpmCommand}"
+                                    CommandParameter="-10"
+                                    Style="{StaticResource RawBlockSecondaryButton}"
+                                    ToolTip="Decrease BPM by 10 (Shift+Down)" />
+
+                            <Button Grid.Column="1"
+                                    Content="−"
+                                    FontSize="22"
+                                    Width="48" Height="48"
+                                    Padding="0"
+                                    Command="{Binding AdjustBpmCommand}"
+                                    CommandParameter="-1"
+                                    Style="{StaticResource RawBlockSecondaryButton}"
+                                    ToolTip="Decrease BPM by 1 (Down Arrow)" />
+
+                            <StackPanel Grid.Column="2"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Bpm}"
+                                           FontFamily="{StaticResource HeadlineFont}"
+                                           FontSize="68"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,-12,0,-10"
+                                           Foreground="{StaticResource RawBlackBrush}" />
+                                <TextBlock Text="BPM"
+                                           FontFamily="{StaticResource MonoFont}"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"
+                                           Foreground="{StaticResource RawBlackBrush}" />
+                            </StackPanel>
+
+                            <Button Grid.Column="3"
+                                    Content="+"
+                                    FontSize="22"
+                                    Width="48" Height="48"
+                                    Padding="0"
+                                    Command="{Binding AdjustBpmCommand}"
+                                    CommandParameter="1"
+                                    Style="{StaticResource RawBlockSecondaryButton}"
+                                    ToolTip="Increase BPM by 1 (Up Arrow)" />
+
+                            <Button Grid.Column="4"
+                                    Content="+10"
+                                    Width="66" Height="48"
+                                    Padding="0"
+                                    Margin="8,0,0,0"
+                                    Command="{Binding AdjustBpmCommand}"
+                                    CommandParameter="10"
+                                    Style="{StaticResource RawBlockSecondaryButton}"
+                                    ToolTip="Increase BPM by 10 (Shift+Up)" />
+                        </Grid>
+
+                        <!-- Tempo Marking & Metric Slogan -->
+                        <Border Grid.Row="1"
+                                HorizontalAlignment="Center"
+                                Background="{StaticResource RawBlackBrush}"
+                                BorderBrush="{StaticResource RawBlackBrush}"
+                                BorderThickness="2"
+                                CornerRadius="0"
+                                Padding="12,3"
+                                Margin="0,8,0,0">
+                            <TextBlock FontFamily="{StaticResource MonoFont}"
+                                       FontSize="13"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource RawWhiteBrush}">
+                                <Run Text="{Binding TempoMarking, Mode=OneWay}" />
+                                <Run Text=" // " />
+                                <Run Text="{Binding TimeSignatureDisplay, Mode=OneWay}" />
+                            </TextBlock>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- 2. BEAT BLOCKS (BRUTALIST VISUAL INDICATOR + ACCENT EDITOR) -->
+                <Border Background="{StaticResource RawWhiteBrush}"
+                        BorderBrush="{StaticResource RawBlackBrush}"
+                        BorderThickness="3"
+                        CornerRadius="0"
+                        Padding="14,12"
+                        Margin="0,0,0,12">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,10">
+                            <TextBlock Text="BEATS &amp; ACCENTS"
+                                       FontFamily="{StaticResource HeadlineFont}"
+                                       FontSize="13"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource RawBlackBrush}" />
+                            <TextBlock Text="CLICK BLOCK TO CYCLE: ACCENT → NORMAL → MUTE"
+                                       FontFamily="{StaticResource MonoFont}"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       HorizontalAlignment="Right" />
+                        </Grid>
+
+                        <ItemsControl ItemsSource="{Binding BeatDots}"
+                                      HorizontalAlignment="Center">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"
+                                               HorizontalAlignment="Center" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:BeatDotViewModel}">
+                                    <Button Command="{Binding CycleAccentCommand}"
+                                            Focusable="False"
+                                            Cursor="Hand"
+                                            Margin="4,4"
+                                            ToolTip="Click to cycle: Accent / Normal / Mute">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <StackPanel Width="50">
+                                                    <!-- Brutalist Square Beat Block (0px radius) -->
+                                                    <Border x:Name="BeatBox"
+                                                            Width="46" Height="46"
+                                                            Background="{StaticResource RawWhiteBrush}"
+                                                            BorderBrush="{StaticResource RawBlackBrush}"
+                                                            BorderThickness="3"
+                                                            CornerRadius="0">
+                                                        <Grid>
+                                                            <TextBlock x:Name="BeatNumText"
+                                                                       Text="{Binding BeatNumber}"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"
+                                                                       FontFamily="{StaticResource MonoFont}"
+                                                                       FontWeight="Bold"
+                                                                       FontSize="18"
+                                                                       Foreground="{StaticResource RawBlackBrush}" />
+                                                        </Grid>
+                                                    </Border>
+
+                                                    <Border x:Name="BadgeBorder"
+                                                            Background="{StaticResource RawWhiteBrush}"
+                                                            BorderBrush="{StaticResource RawBlackBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="0"
+                                                            Margin="0,3,0,0"
+                                                            Padding="2,1">
+                                                        <TextBlock x:Name="AccentBadge"
+                                                                   Text="{Binding AccentLabel}"
+                                                                   HorizontalAlignment="Center"
+                                                                   FontFamily="{StaticResource MonoFont}"
+                                                                   FontSize="10"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="{StaticResource RawBlackBrush}" />
+                                                    </Border>
+                                                </StackPanel>
+
+                                                <ControlTemplate.Triggers>
+                                                    <!-- Accent Level Styling -->
+                                                    <DataTrigger Binding="{Binding AccentLevel}" Value="{x:Static models:AccentLevel.Accent}">
+                                                        <Setter TargetName="BeatBox" Property="BorderThickness" Value="5" />
+                                                        <Setter TargetName="BadgeBorder" Property="Background" Value="{StaticResource RawBlackBrush}" />
+                                                        <Setter TargetName="AccentBadge" Property="Foreground" Value="{StaticResource RawWhiteBrush}" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding AccentLevel}" Value="{x:Static models:AccentLevel.Normal}">
+                                                        <Setter TargetName="BeatBox" Property="BorderThickness" Value="3" />
+                                                        <Setter TargetName="BadgeBorder" Property="Background" Value="{StaticResource RawWhiteBrush}" />
+                                                        <Setter TargetName="AccentBadge" Property="Foreground" Value="{StaticResource RawBlackBrush}" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger Binding="{Binding AccentLevel}" Value="{x:Static models:AccentLevel.Mute}">
+                                                        <Setter TargetName="BeatBox" Property="BorderThickness" Value="3" />
+                                                        <Setter TargetName="BeatBox" Property="BorderBrush" Value="{StaticResource RawBorderDisabledBrush}" />
+                                                        <Setter TargetName="BeatBox" Property="Background" Value="{StaticResource RawSurfaceSunkenBrush}" />
+                                                        <Setter TargetName="BeatNumText" Property="Foreground" Value="{StaticResource RawDisabledTextBrush}" />
+                                                        <Setter TargetName="BadgeBorder" Property="BorderBrush" Value="{StaticResource RawBorderDisabledBrush}" />
+                                                        <Setter TargetName="BadgeBorder" Property="Background" Value="{StaticResource RawSurfaceSunkenBrush}" />
+                                                        <Setter TargetName="AccentBadge" Property="Foreground" Value="{StaticResource RawDisabledTextBrush}" />
+                                                    </DataTrigger>
+
+                                                    <!-- RAWBLOCK INVERTED FLASH PULSE ON HEARD BEAT -->
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsPulseLit}" Value="True" />
+                                                            <Condition Binding="{Binding AccentLevel}" Value="{x:Static models:AccentLevel.Accent}" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter TargetName="BeatBox" Property="Background" Value="{StaticResource RawBlackBrush}" />
+                                                        <Setter TargetName="BeatBox" Property="BorderThickness" Value="5" />
+                                                        <Setter TargetName="BeatNumText" Property="Foreground" Value="{StaticResource RawWhiteBrush}" />
+                                                    </MultiDataTrigger>
+
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsPulseLit}" Value="True" />
+                                                            <Condition Binding="{Binding AccentLevel}" Value="{x:Static models:AccentLevel.Normal}" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter TargetName="BeatBox" Property="Background" Value="{StaticResource RawBlackBrush}" />
+                                                        <Setter TargetName="BeatNumText" Property="Foreground" Value="{StaticResource RawWhiteBrush}" />
+                                                    </MultiDataTrigger>
+
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsPulseLit}" Value="True" />
+                                                            <Condition Binding="{Binding AccentLevel}" Value="{x:Static models:AccentLevel.Mute}" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter TargetName="BeatBox" Property="Background" Value="{StaticResource RawBorderDisabledBrush}" />
+                                                        <Setter TargetName="BeatNumText" Property="Foreground" Value="{StaticResource RawBlackBrush}" />
+                                                    </MultiDataTrigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- 3. TIME SIGNATURE (THE CORE ENHANCEMENT: QUICK CHIPS + DIRECT INPUT + STEPPERS) -->
+                <Border Background="{StaticResource RawWhiteBrush}"
+                        BorderBrush="{StaticResource RawBlackBrush}"
+                        BorderThickness="3"
+                        CornerRadius="0"
+                        Padding="14,12"
+                        Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="TIME SIGNATURE"
+                                   FontFamily="{StaticResource HeadlineFont}"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource RawBlackBrush}"
+                                   Margin="0,0,0,8" />
+
+                        <!-- Quick Time Signature Chips -->
+                        <TextBlock Text="QUICK SELECT (ONE CLICK):"
+                                   FontFamily="{StaticResource MonoFont}"
+                                   FontSize="10"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   Margin="0,0,0,4" />
+
+                        <WrapPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <Button Content="2/4" MinWidth="58" Height="36" Padding="4,2" Margin="0,0,6,6"
+                                    Command="{Binding SelectTimeSignatureCommand}" CommandParameter="2/4"
+                                    Style="{StaticResource RawBlockSecondaryButton}" />
+                            <Button Content="3/4" MinWidth="58" Height="36" Padding="4,2" Margin="0,0,6,6"
+                                    Command="{Binding SelectTimeSignatureCommand}" CommandParameter="3/4"
+                                    Style="{StaticResource RawBlockSecondaryButton}" />
+                            <Button Content="4/4" MinWidth="58" Height="36" Padding="4,2" Margin="0,0,6,6"
+                                    Command="{Binding SelectTimeSignatureCommand}" CommandParameter="4/4"
+                                    Style="{StaticResource RawBlockSecondaryButton}" />
+                            <Button Content="5/4" MinWidth="58" Height="36" Padding="4,2" Margin="0,0,6,6"
+                                    Command="{Binding SelectTimeSignatureCommand}" CommandParameter="5/4"
+                                    Style="{StaticResource RawBlockSecondaryButton}" />
+                            <Button Content="6/8" MinWidth="58" Height="36" Padding="4,2" Margin="0,0,6,6"
+                                    Command="{Binding SelectTimeSignatureCommand}" CommandParameter="6/8"
+                                    Style="{StaticResource RawBlockSecondaryButton}" />
+                            <Button Content="7/8" MinWidth="58" Height="36" Padding="4,2" Margin="0,0,6,6"
+                                    Command="{Binding SelectTimeSignatureCommand}" CommandParameter="7/8"
+                                    Style="{StaticResource RawBlockSecondaryButton}" />
+                            <Button Content="8/8" MinWidth="58" Height="36" Padding="4,2" Margin="0,0,6,6"
+                                    Command="{Binding SelectTimeSignatureCommand}" CommandParameter="8/8"
+                                    Style="{StaticResource RawBlockSecondaryButton}" />
+                            <Button Content="9/8" MinWidth="58" Height="36" Padding="4,2" Margin="0,0,6,6"
+                                    Command="{Binding SelectTimeSignatureCommand}" CommandParameter="9/8"
+                                    Style="{StaticResource RawBlockSecondaryButton}" />
+                            <Button Content="12/8" MinWidth="70" Height="36" Padding="4,2" Margin="0,0,6,6"
+                                    Command="{Binding SelectTimeSignatureCommand}" CommandParameter="12/8"
+                                    Style="{StaticResource RawBlockSecondaryButton}" />
+                        </WrapPanel>
+
+                        <!-- Custom Time Signature Inputs & Steppers -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.2*" />
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="2.2*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Combined Direct Input -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="DIRECT INPUT (e.g. 6/8)"
+                                           FontFamily="{StaticResource MonoFont}"
+                                           FontSize="10"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           Margin="0,0,0,3" />
+                                <TextBox x:Name="TimeSignatureTextBox"
+                                         Height="38"
+                                         Text="{Binding TimeSignatureInputText, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource DarkTextBoxStyle}"
+                                         TextAlignment="Center"
+                                         FontSize="16"
+                                         Padding="4,2"
+                                         KeyDown="TimeSignatureTextBox_KeyDown"
+                                         LostFocus="TimeSignatureTextBox_LostFocus"
+                                         ToolTip="Type any time signature like 4/4, 6/8, 8/8, 7/8 and press Enter" />
+                            </StackPanel>
+
+                            <!-- Separate Numerator / Denominator Steppers -->
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="BEATS (NUM) / NOTE UNIT (DEN)"
+                                           FontFamily="{StaticResource MonoFont}"
+                                           FontSize="10"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           Margin="0,0,0,3" />
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Numerator Stepper -->
+                                    <Button Content="−" Width="34" Height="38" Padding="0"
+                                            Command="{Binding DecrementNumeratorCommand}"
+                                            Style="{StaticResource RawBlockSecondaryButton}" />
+                                    <TextBox x:Name="NumeratorTextBox"
+                                             Width="58" Height="38" Margin="4,0"
+                                             Text="{Binding NumeratorInputText, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource DarkTextBoxStyle}"
+                                             TextAlignment="Center"
+                                             Padding="2,0"
+                                             KeyDown="NumeratorTextBox_KeyDown"
+                                             LostFocus="NumeratorTextBox_LostFocus"
+                                             ToolTip="Beats per bar (1–32)" />
+                                    <Button Content="+" Width="34" Height="38" Padding="0"
+                                            Command="{Binding IncrementNumeratorCommand}"
+                                            Style="{StaticResource RawBlockSecondaryButton}" />
+
+                                    <TextBlock Text="/"
+                                               FontFamily="{StaticResource HeadlineFont}"
+                                               FontSize="22"
+                                               FontWeight="Bold"
+                                               Margin="8,0"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource RawBlackBrush}" />
+
+                                    <!-- Denominator Musical Stepper -->
+                                    <Button Content="−" Width="34" Height="38" Padding="0"
+                                            Command="{Binding DecrementDenominatorCommand}"
+                                            Style="{StaticResource RawBlockSecondaryButton}"
+                                            ToolTip="Halve denominator (e.g. 8 -> 4 -> 2)" />
+                                    <TextBox x:Name="DenominatorTextBox"
+                                             Width="58" Height="38" Margin="4,0"
+                                             Text="{Binding DenominatorInputText, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource DarkTextBoxStyle}"
+                                             TextAlignment="Center"
+                                             Padding="2,0"
+                                             KeyDown="DenominatorTextBox_KeyDown"
+                                             LostFocus="DenominatorTextBox_LostFocus"
+                                             ToolTip="Beat unit note value (e.g. 2, 4, 8, 16)" />
+                                    <Button Content="+" Width="34" Height="38" Padding="0"
+                                            Command="{Binding IncrementDenominatorCommand}"
+                                            Style="{StaticResource RawBlockSecondaryButton}"
+                                            ToolTip="Double denominator (e.g. 4 -> 8 -> 16)" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 4. TEMPO SLIDER, EXACT BPM & TAP TEMPO -->
+                <Border Background="{StaticResource RawWhiteBrush}"
+                        BorderBrush="{StaticResource RawBlackBrush}"
+                        BorderThickness="3"
+                        CornerRadius="0"
+                        Padding="14,12"
+                        Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,14,0">
+                            <TextBlock Text="TEMPO SLIDER (1 – 400 BPM)"
+                                       FontFamily="{StaticResource HeadlineFont}"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource RawBlackBrush}"
+                                       Margin="0,0,0,4" />
+                            <Slider Minimum="1"
+                                    Maximum="400"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    Focusable="False"
+                                    Value="{Binding Bpm, Mode=TwoWay}"
+                                    VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Margin="0,0,12,0" VerticalAlignment="Center">
+                            <TextBlock Text="EXACT"
+                                       FontFamily="{StaticResource MonoFont}"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       Margin="0,0,0,3" />
+                            <TextBox x:Name="BpmTextBox"
+                                     Width="84"
+                                     Height="38"
+                                     Padding="4,0"
+                                     Text="{Binding BpmInputText, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource DarkTextBoxStyle}"
+                                     TextAlignment="Center"
+                                     KeyDown="BpmTextBox_KeyDown"
+                                     LostFocus="BpmTextBox_LostFocus"
+                                     ToolTip="Type 1–400 and press Enter" />
+                        </StackPanel>
+
+                        <Button Grid.Column="2"
+                                Content="TAP TEMPO (T)"
+                                MinWidth="165"
+                                Height="48"
+                                Padding="12,6"
+                                VerticalAlignment="Bottom"
+                                Command="{Binding TapTempoCommand}"
+                                Style="{StaticResource RawBlockPrimaryButton}"
+                                ToolTip="Tap repeatedly or press T to set tempo" />
+                    </Grid>
+                </Border>
+
+                <!-- 5. SUBDIVISION & CLICK SOUND -->
+                <Border Background="{StaticResource RawWhiteBrush}"
+                        BorderBrush="{StaticResource RawBlackBrush}"
+                        BorderThickness="3"
+                        CornerRadius="0"
+                        Padding="14,12"
+                        Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="14" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Subdivision Picker -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="SUBDIVISION"
+                                       FontFamily="{StaticResource HeadlineFont}"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource RawBlackBrush}"
+                                       Margin="0,0,0,6" />
+                            <ComboBox Height="36"
+                                      ItemsSource="{Binding SubdivisionOptions}"
+                                      DisplayMemberPath="Label"
+                                      SelectedValuePath="Value"
+                                      SelectedValue="{Binding SelectedSubdivision, Mode=TwoWay}"
+                                      Style="{StaticResource DarkComboBoxStyle}" />
+                        </StackPanel>
+
+                        <!-- Click Sound Picker -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="CLICK SOUND"
+                                       FontFamily="{StaticResource HeadlineFont}"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource RawBlackBrush}"
+                                       Margin="0,0,0,6" />
+                            <ComboBox Height="36"
+                                      ItemsSource="{Binding SoundOptions}"
+                                      DisplayMemberPath="Label"
+                                      SelectedValuePath="Value"
+                                      SelectedValue="{Binding SelectedSound, Mode=TwoWay}"
+                                      Style="{StaticResource DarkComboBoxStyle}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 6. MASTER VOLUME & SUBDIVISION VOLUME -->
+                <Border Background="{StaticResource RawWhiteBrush}"
+                        BorderBrush="{StaticResource RawBlackBrush}"
+                        BorderThickness="3"
+                        CornerRadius="0"
+                        Padding="14,12"
+                        Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <Grid Margin="0,0,0,4">
+                                <TextBlock Text="MASTER VOLUME"
+                                           FontFamily="{StaticResource HeadlineFont}"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource RawBlackBrush}" />
+                                <TextBlock HorizontalAlignment="Right"
+                                           FontFamily="{StaticResource MonoFont}"
+                                           FontSize="12"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource RawBlackBrush}">
+                                    <Run Text="{Binding MasterVolumePercent, Mode=OneWay}" /><Run Text="%" />
+                                </TextBlock>
+                            </Grid>
+                            <Slider Minimum="0"
+                                    Maximum="100"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    Focusable="False"
+                                    Value="{Binding MasterVolumePercent, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <Grid Margin="0,0,0,4">
+                                <TextBlock Text="SUBDIVISION VOLUME"
+                                           FontFamily="{StaticResource HeadlineFont}"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource RawBlackBrush}" />
+                                <TextBlock HorizontalAlignment="Right"
+                                           FontFamily="{StaticResource MonoFont}"
+                                           FontSize="12"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource RawBlackBrush}">
+                                    <Run Text="{Binding SubdivisionVolumePercent, Mode=OneWay}" /><Run Text="%" />
+                                </TextBlock>
+                            </Grid>
+                            <Slider Minimum="0"
+                                    Maximum="100"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    Focusable="False"
+                                    Value="{Binding SubdivisionVolumePercent, Mode=TwoWay}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 7. PRESETS MANAGER -->
+                <Border Background="{StaticResource RawWhiteBrush}"
+                        BorderBrush="{StaticResource RawBlackBrush}"
+                        BorderThickness="3"
+                        CornerRadius="0"
+                        Padding="14,12"
+                        Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="PRESETS"
+                                   FontFamily="{StaticResource HeadlineFont}"
+                                   FontSize="11"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource RawBlackBrush}"
+                                   Margin="0,0,0,6" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ComboBox Grid.Column="0"
+                                      Height="36"
+                                      Margin="0,0,8,0"
+                                      ItemsSource="{Binding Presets}"
+                                      DisplayMemberPath="Name"
+                                      SelectedItem="{Binding SelectedPreset, Mode=TwoWay}"
+                                      Style="{StaticResource DarkComboBoxStyle}" />
+
+                            <Button Grid.Column="1"
+                                    Content="SAVE"
+                                    Margin="0,0,5,0"
+                                    Height="36"
+                                    Command="{Binding SavePresetCommand}"
+                                    Style="{StaticResource RawBlockSecondaryButton}"
+                                    ToolTip="Save over selected preset (Ctrl+S)" />
+
+                            <Button Grid.Column="2"
+                                    Content="SAVE AS"
+                                    Margin="0,0,5,0"
+                                    Height="36"
+                                    Command="{Binding BeginSaveAsPresetCommand}"
+                                    Style="{StaticResource RawBlockSecondaryButton}" />
+
+                            <Button Grid.Column="3"
+                                    Content="RENAME"
+                                    Margin="0,0,5,0"
+                                    Height="36"
+                                    IsEnabled="{Binding CanModifySelectedPreset}"
+                                    Command="{Binding BeginRenamePresetCommand}"
+                                    Style="{StaticResource RawBlockSecondaryButton}" />
+
+                            <Button Grid.Column="4"
+                                    Content="DELETE"
+                                    Height="36"
+                                    IsEnabled="{Binding CanModifySelectedPreset}"
+                                    Command="{Binding DeletePresetCommand}"
+                                    Style="{StaticResource RawBlockDestructiveButton}" />
+                        </Grid>
+
+                        <!-- Inline Save-As / Rename Bar -->
+                        <Border Visibility="{Binding IsEditingPresetName, Converter={StaticResource BoolToVis}}"
+                                Background="{StaticResource RawSurfaceSunkenBrush}"
+                                BorderBrush="{StaticResource RawBlackBrush}"
+                                BorderThickness="3"
+                                CornerRadius="0"
+                                Padding="10,8"
+                                Margin="0,8,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding PresetEditorPrompt}"
+                                           FontFamily="{StaticResource MonoFont}"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0"
+                                           FontSize="12"
+                                           Foreground="{StaticResource RawBlackBrush}" />
+
+                                <TextBox x:Name="PresetNameTextBox"
+                                         Grid.Column="1"
+                                         Text="{Binding PresetNameInput, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource DarkTextBoxStyle}"
+                                         Margin="0,0,8,0"
+                                         KeyDown="PresetNameTextBox_KeyDown" />
+
+                                <Button Grid.Column="2"
+                                        Content="OK"
+                                        Margin="0,0,5,0"
+                                        Height="34"
+                                        Command="{Binding ConfirmPresetNameCommand}"
+                                        Style="{StaticResource RawBlockPrimaryButton}" />
+
+                                <Button Grid.Column="3"
+                                        Content="CANCEL"
+                                        Height="34"
+                                        Command="{Binding CancelPresetNameCommand}"
+                                        Style="{StaticResource RawBlockSecondaryButton}" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- 8. BOTTOM PRIMARY ACTION & SHORTCUT LEGEND -->
+        <StackPanel Grid.Row="2" Margin="0,8,0,0">
+            <!-- Large Start / Stop Button -->
+            <Button Height="56"
+                    Command="{Binding TogglePlayCommand}"
+                    Focusable="False"
+                    Cursor="Hand">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="PlayBorder"
+                                CornerRadius="0"
+                                Background="{StaticResource RawBlackBrush}"
+                                BorderBrush="{StaticResource RawBlackBrush}"
+                                BorderThickness="3">
+                            <TextBlock x:Name="PlayLabel"
+                                       Text="{Binding PlayButtonText}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontFamily="{StaticResource HeadlineFont}"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource RawWhiteBrush}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="PlayBorder" Property="Background" Value="{StaticResource RawWhiteBrush}" />
+                                <Setter TargetName="PlayLabel" Property="Foreground" Value="{StaticResource RawBlackBrush}" />
+                            </Trigger>
+                            <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                <Setter TargetName="PlayBorder" Property="Background" Value="{StaticResource RawErrorBrush}" />
+                                <Setter TargetName="PlayLabel" Property="Foreground" Value="{StaticResource RawWhiteBrush}" />
+                            </DataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsPlaying}" Value="True" />
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter TargetName="PlayBorder" Property="Background" Value="{StaticResource RawBlackBrush}" />
+                                <Setter TargetName="PlayLabel" Property="Foreground" Value="{StaticResource RawErrorBrush}" />
+                            </MultiDataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+            <TextBlock HorizontalAlignment="Center"
+                       Margin="0,8,0,0"
+                       FontFamily="{StaticResource MonoFont}"
+                       FontSize="11"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource TextMutedBrush}"
+                       Text="SPACE: START/STOP  ·  ↑/↓: ±1 BPM  ·  SHIFT+↑/↓: ±10 BPM  ·  T: TAP  ·  CTRL+S: SAVE" />
+        </StackPanel>
+    </Grid>
+</Window>
