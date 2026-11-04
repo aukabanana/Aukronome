@@ -9,7 +9,13 @@
     <AssemblyName>Aukronome</AssemblyName>
     <RootNamespace>Aukronome.App</RootNamespace>
     <LangVersion>latest</LangVersion>
+    <ApplicationIcon>Assets\Aukronome.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Aukronome.ico" />
+    <Resource Include="Assets\Aukronome.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
