@@ -1,4 +1,4 @@
-# Aukronome // RawBlock Edition
+# Aukronome
 
 A high-precision, sample-accurate metronome for Windows, engineered in C# (.NET 8) and styled in the stark brutalist **RawBlock Design System**.
 
