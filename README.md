@@ -8,7 +8,21 @@ Designed for solo musicians, music teachers, and rhythm practice, Aukronome mixe
 
 ## Quick Start Guide
 
-### Option 1: Standalone Portable App (No Install Needed)
+### Option 1: Windows Graphical Setup Installer (Recommended — No CMD Needed)
+For everyday users who just want to install and use Aukronome without opening any terminal or command prompt:
+
+1. Download **Aukronome-Setup-v1.0.0.exe** (from Releases or build it below).
+2. Double-click the .exe to run the setup wizard.
+3. Click **Next > Install**:
+   - Automatically installs to your user directory (no admin rights or UAC elevation required).
+   - Automatically adds a **Desktop shortcut** with the brutalist logo.
+   - Automatically registers in the **Windows Start Menu** (instantly searchable by typing Aukronome in Windows search).
+   - Registers a clean uninstaller in Windows Settings (*Apps > Installed apps*).
+
+> **To build the installer from source without typing commands:**
+> Simply double-click **Build-Installer.bat** in the repository root. It publishes the single-file binary, builds the installer with Inno Setup, and outputs installer\output\Aukronome-Setup-v1.0.0.exe.
+
+### Option 2: Standalone Portable App (No Install Needed)
 You can produce a single self-contained `.exe` file that runs on any Windows 10/11 computer without installing the .NET runtime:
 
 ```powershell
