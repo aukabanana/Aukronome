@@ -22,6 +22,20 @@ Designed for solo musicians, music teachers, and rhythm practice, Aukronome mixe
 
 ## Quick Start & Installation
 
+> [!NOTE]
+> ### 🛡️ Windows SmartScreen Notice ("Windows protected your PC")
+> Because Aukronome is an independent open-source project and does not have an expensive enterprise digital certificate ($300+/year), Windows Defender SmartScreen or your browser may display a warning:
+> - **In Windows:** *"Windows protected your PC — Microsoft Defender SmartScreen prevented an unrecognized app from starting."*
+> - **In Browsers (Edge / Chrome):** *"This file isn't commonly downloaded and might be harmful."*
+>
+> **How to proceed:**
+> 1. On the blue Windows SmartScreen popup, click **"More info"**.
+> 2. Click the **"Run anyway"** button at the bottom right.
+> 3. If prompted by your browser, click the three dots `...` or arrow next to the download > **Keep** > **Keep anyway**.
+>
+> Aukronome is 100% free and open-source, runs completely offline, and contains zero trackers, telemetry, or external network calls. You can review all source code here and verify SHA-256 hashes against `SHA256SUMS.txt`.
+
+
 ### Option 1: Windows Graphical Setup Installer (Recommended — No CMD Needed)
 For everyday musicians and users who want to install and use Aukronome without opening a terminal:
 
