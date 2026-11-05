@@ -46,6 +46,7 @@ Desktop.ini
 publish/
 dist/
 installer/output/
+release_assets/
 
 ## Environment / Secrets (if ever added)
 .env
