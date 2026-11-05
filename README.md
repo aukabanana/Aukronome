@@ -217,6 +217,4 @@ dotnet test --logger "console;verbosity=detailed"
 
 ## License
 
-This project is licensed under the terms of the **MIT License**.
-SOFTWARE.
-```
+This project is licensed under the terms of the [MIT License](LICENSE).
