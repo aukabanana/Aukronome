@@ -23,8 +23,8 @@ Designed for solo musicians, music teachers, and rhythm practice, Aukronome mixe
 ## Quick Start & Installation
 
 > [!NOTE]
-> ### 🛡️ Windows SmartScreen Notice ("Windows protected your PC")
-> Because Aukronome is an independent open-source project and does not have an expensive enterprise digital certificate ($300+/year), Windows Defender SmartScreen or your browser may display a warning:
+> ### Windows SmartScreen Notice ("Windows protected your PC")
+> Because Aukronome is an independent open-source project and does not have an expensive enterprise digital certificate, Windows Defender SmartScreen or your browser may display a warning:
 > - **In Windows:** *"Windows protected your PC — Microsoft Defender SmartScreen prevented an unrecognized app from starting."*
 > - **In Browsers (Edge / Chrome):** *"This file isn't commonly downloaded and might be harmful."*
 >
