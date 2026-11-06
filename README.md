@@ -13,7 +13,7 @@ Designed for solo musicians, music teachers, and rhythm practice, Aukronome mixe
 - **Flexible Time Signatures:** Full support for simple, compound, and complex odd meters (`4/4`, `3/4`, `6/8`, `7/8`, `8/8`, `12/8`, etc.) with quick-select chips and direct text entry.
 - **3-State Interactive Accent Editor:** Click individual beat blocks to toggle between **Accent (`ACC`)**, **Normal (`NRM`)**, and **Mute (`MUTE`)** for rhythm gap training.
 - **Subdivisions with Independent Volume:** Practice 8ths, Triplets, 16ths, Quintuplets, and Sextuplets with a dedicated volume fader.
-- **100% Algorithmic Sound Synthesis:** Zero external WAV dependencies. Sounds (Click, Beep, Woodblock, Cowbell, Hi-Hat) are generated in code algorithms.
+- **100% Algorithmic Sound Synthesis:** Zero external WAV dependencies. Sounds (Click, Beep, Woodblock, Cowbell, Hi-Hat, Mechanical) are generated in code algorithms.
 - **Adaptive Tap Tempo:** 4-tap rolling average with smart pause detection that automatically adapts to slow tempos.
 - **Session & Preset Persistence:** Save song tempos, time signatures, and accent patterns to `%AppData%\Aukronome\presets.json`. Restores your exact window size and settings on launch.
 - **Latency-Compensated Visual Sync:** Beat blocks invert to solid black precisely when sound leaves the physical speaker cones.
@@ -134,6 +134,7 @@ All audio is synthesized mathematically in C# code with zero external WAV files:
 - **Woodblock:** Organic acoustic hardwood percussion strike.
 - **Cowbell:** 808-style dual-oscillator resonant strike.
 - **Hi-Hat:** Metallic sizzle cymbal.
+- **Mechanical (Classic):** Authentic acoustic mechanical pendulum metronome — warm hollow wooden pyramid casing resonance on normal beats, classic brass bell chime on accents, and crisp mechanical escapement tick on subdivisions.
 
 Each sound has dedicated **Accent**, **Normal**, and **Subdivision** voices tuned by pitch and envelope.
 
@@ -196,7 +197,7 @@ Aukronome/
 │       ├── Views/               # MainWindow.xaml, MainWindow.xaml.cs
 │       └── App.xaml             # RawBlock brutalist styles and color dictionary
 └── tests/
-    └── Aukronome.Core.Tests/    # 35 xUnit tests (timing, tap tempo, storage, meter math)
+    └── Aukronome.Core.Tests/    # 41 xUnit tests (timing, tap tempo, storage, meter math)
 ```
 
 ---
@@ -214,7 +215,7 @@ dotnet run --project src/Aukronome.App
 
 ### Run Unit Tests
 ```powershell
-# Run all 35 xUnit tests
+# Run all 41 xUnit tests
 dotnet test
 
 # Run with detailed output

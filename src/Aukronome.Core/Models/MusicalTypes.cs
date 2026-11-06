@@ -69,7 +69,8 @@ public enum SoundType
     Beep = 1,
     Woodblock = 2,
     Cowbell = 3,
-    HiHat = 4
+    HiHat = 4,
+    Mechanical = 5
 }
 
 public static class SoundTypeExtensions
@@ -81,6 +82,7 @@ public static class SoundTypeExtensions
         SoundType.Woodblock => "Woodblock",
         SoundType.Cowbell => "Cowbell",
         SoundType.HiHat => "Hi-Hat",
+        SoundType.Mechanical => "Mechanical (Classic)",
         _ => sound.ToString()
     };
 }

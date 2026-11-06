@@ -207,4 +207,27 @@ public class MetronomeSampleProviderTests
         Assert.Equal(1, state1Tail.BeatIndex);
         Assert.False(state1Tail.IsPulseLit);
     }
+
+    [Theory]
+    [InlineData(SoundType.Click)]
+    [InlineData(SoundType.Beep)]
+    [InlineData(SoundType.Woodblock)]
+    [InlineData(SoundType.Cowbell)]
+    [InlineData(SoundType.HiHat)]
+    [InlineData(SoundType.Mechanical)]
+    public void SoundSynthesizer_AllSoundTypes_GenerateValidBuffers(SoundType soundType)
+    {
+        const int sampleRate = 48000;
+        var bank = SoundSynthesizer.CreateBank(soundType, sampleRate);
+
+        Assert.NotNull(bank);
+        Assert.Equal(soundType, bank.SoundType);
+        Assert.True(bank.Accent.Length > 0);
+        Assert.True(bank.Normal.Length > 0);
+        Assert.True(bank.Subdivision.Length > 0);
+
+        Assert.Contains(bank.Accent, s => MathF.Abs(s) > 0.1f);
+        Assert.Contains(bank.Normal, s => MathF.Abs(s) > 0.1f);
+        Assert.Contains(bank.Subdivision, s => MathF.Abs(s) > 0.1f);
+    }
 }

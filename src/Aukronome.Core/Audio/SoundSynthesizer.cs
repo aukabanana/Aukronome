@@ -74,6 +74,13 @@ public static class SoundSynthesizer
                 SynthesizeHiHat(sampleRate, durationSec: 0.038f, decayRate: 95f, peakGain: 0.70f),
                 SynthesizeHiHat(sampleRate, durationSec: 0.022f, decayRate: 140f, peakGain: 0.52f)),
 
+            SoundType.Mechanical => new SynthesizedSoundBank(
+                soundType,
+                sampleRate,
+                SynthesizeMechanicalAccent(sampleRate, peakGain: 0.95f),
+                SynthesizeMechanicalNormal(sampleRate, peakGain: 0.78f),
+                SynthesizeMechanicalSubdivision(sampleRate, peakGain: 0.54f)),
+
             _ => throw new ArgumentOutOfRangeException(nameof(soundType), soundType, "Unknown sound type.")
         };
     }
@@ -237,4 +244,111 @@ public static class SoundSynthesizer
             buffer[i] *= scale * fade;
         }
     }
+
+    private static float[] SynthesizeMechanicalNormal(int sampleRate, float peakGain)
+    {
+        // Classical wooden metronome escapement "Tok" (~42 ms)
+        float durationSec = 0.042f;
+        int length = Math.Max(16, (int)(sampleRate * durationSec));
+        var buffer = new float[length];
+        double phase1 = 0.0;
+        double phase2 = 0.0;
+        int clickImpulseSamples = Math.Max(2, (int)(sampleRate * 0.0018f));
+
+        for (int i = 0; i < length; i++)
+        {
+            double t = (double)i / sampleRate;
+
+            // 1. Initial mechanical escapement click impulse (sharp pallet release)
+            double click = (i < clickImpulseSamples)
+                ? Math.Sin(2.0 * Math.PI * 3400.0 * t) * 0.55
+                : 0.0;
+
+            // 2. Hollow wooden pyramid casing acoustic resonance (~440 Hz body fundamental with rapid decay, plus 1160 Hz box mode)
+            double pitchDrop = 1.0 + 0.35 * Math.Exp(-t * 380.0);
+            double f1 = 440.0 * pitchDrop;
+            double f2 = 1160.0 * pitchDrop;
+
+            phase1 += 2.0 * Math.PI * f1 / sampleRate;
+            phase2 += 2.0 * Math.PI * f2 / sampleRate;
+
+            double bodyEnv = Math.Exp(-t * 95.0);
+
+            double sample = click + (Math.Sin(phase1) * 0.75 + Math.Sin(phase2) * 0.35) * bodyEnv;
+            buffer[i] = (float)sample;
+        }
+
+        NormalizeInPlace(buffer, peakGain);
+        return buffer;
+    }
+
+    private static float[] SynthesizeMechanicalAccent(int sampleRate, float peakGain)
+    {
+        // Authentic mechanical downbeat bell chime + escapement strike (~150 ms)
+        float durationSec = 0.150f;
+        int length = Math.Max(16, (int)(sampleRate * durationSec));
+        var buffer = new float[length];
+
+        // Escapement base click
+        float[] escapement = SynthesizeMechanicalNormal(sampleRate, peakGain: 0.70f);
+
+        // Bell frequencies: C7 (2093 Hz) + high octave (4186 Hz) + inharmonic overtone (5920 Hz)
+        const double fBell1 = 2093.0;
+        const double fBell2 = 4186.0;
+        const double fBell3 = 5920.0;
+        int strikeSamples = Math.Max(2, (int)(sampleRate * 0.004f));
+
+        for (int i = 0; i < length; i++)
+        {
+            double t = (double)i / sampleRate;
+            double wood = (i < escapement.Length) ? escapement[i] : 0.0;
+
+            // Metallic hammer strike transient
+            double strike = (i < strikeSamples)
+                ? Math.Sin(2.0 * Math.PI * 4800.0 * t) * Math.Exp(-t * 550.0) * 0.35
+                : 0.0;
+
+            // Resonant bell chime ringing
+            double env1 = Math.Exp(-t * 26.0);  // fundamental chime sustain
+            double env2 = Math.Exp(-t * 52.0);  // 2nd harmonic
+            double env3 = Math.Exp(-t * 110.0); // high inharmonic ring
+
+            double bell = (Math.Sin(2.0 * Math.PI * fBell1 * t) * 0.70 * env1)
+                        + (Math.Sin(2.0 * Math.PI * fBell2 * t) * 0.28 * env2)
+                        + (Math.Sin(2.0 * Math.PI * fBell3 * t) * 0.16 * env3);
+
+            buffer[i] = (float)(wood * 0.45 + (bell + strike) * 0.85);
+        }
+
+        NormalizeInPlace(buffer, peakGain);
+        return buffer;
+    }
+
+    private static float[] SynthesizeMechanicalSubdivision(int sampleRate, float peakGain)
+    {
+        // Lighter, higher escapement tick (~20 ms)
+        float durationSec = 0.020f;
+        int length = Math.Max(16, (int)(sampleRate * durationSec));
+        var buffer = new float[length];
+        double phase = 0.0;
+        int clickSamples = Math.Max(2, (int)(sampleRate * 0.0012f));
+
+        for (int i = 0; i < length; i++)
+        {
+            double t = (double)i / sampleRate;
+            double click = (i < clickSamples)
+                ? Math.Sin(2.0 * Math.PI * 4200.0 * t) * 0.5
+                : 0.0;
+
+            double f = 1380.0 * (1.0 + 0.25 * Math.Exp(-t * 450.0));
+            phase += 2.0 * Math.PI * f / sampleRate;
+            double env = Math.Exp(-t * 180.0);
+
+            buffer[i] = (float)(click + Math.Sin(phase) * 0.7 * env);
+        }
+
+        NormalizeInPlace(buffer, peakGain);
+        return buffer;
+    }
+
 }

@@ -91,6 +91,7 @@ Each sound profile renders into three pre-calculated audio float buffers upon se
 3. **Woodblock:** Double-sine modal synthesis ($f_1 = 800\text{ Hz}, f_2 = 1250\text{ Hz}$) combined with a bandpass-filtered noise attack to simulate resonant hardwood percussion.
 4. **Cowbell:** Dual square-wave ring modulation ($f_1 = 587\text{ Hz}, f_2 = 845\text{ Hz}$) shaped through a bandpass filter with sharp exponential decay, modeled after classic analog drum machines.
 5. **Hi-Hat:** 6-operator square wave cluster with dense inharmonic intervals, shaped by a 7 kHz high-pass filter and rapid decay envelope.
+6. **Mechanical (Classic):** Authentic acoustic pendulum metronome modeled after original Mälzel/Wittner clockwork mechanisms. Features an escapement pallet strike transient, hollow wooden pyramid body resonances ( = 440	ext{ Hz}$,  = 1160	ext{ Hz}$), and a dedicated mechanical brass bell chime ( = 2093	ext{ Hz}$,  = 4186	ext{ Hz}$,  = 5920	ext{ Hz}$) on downbeats/accents.
 
 ---
 
