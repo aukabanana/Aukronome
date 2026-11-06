@@ -2,7 +2,7 @@
 ; High-Precision Brutalist RawBlock Metronome for Windows
 
 #define MyAppName "Aukronome"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "aukabanana"
 #define MyAppURL "https://github.com/aukabanana/Aukronome"
 #define MyAppExeName "Aukronome.exe"
@@ -20,7 +20,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=.\output
-OutputBaseFilename=Aukronome-Setup-v1.0.0
+OutputBaseFilename=Aukronome-Setup-v1.0.1
 SetupIconFile=..\src\Aukronome.App\Assets\Aukronome.ico
 Compression=lzma2/ultra64
 SolidCompression=yes

@@ -58,7 +58,7 @@ if %ERRORLEVEL% NEQ 0 (
 echo.
 echo ===================================================
 echo   SUCCESS! Installer ready:
-echo   %~dp0installer\output\Aukronome-Setup-v1.0.0.exe
+echo   %~dp0installer\output\Aukronome-Setup-v1.0.1.exe
 echo ===================================================
 echo.
 if not defined CI if not "%1"=="--no-pause" pause

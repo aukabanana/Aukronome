@@ -1,29 +1,32 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
-    <AssemblyName>Aukronome</AssemblyName>
-    <RootNamespace>Aukronome.App</RootNamespace>
-    <LangVersion>latest</LangVersion>
-    <ApplicationIcon>Assets\Aukronome.ico</ApplicationIcon>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Resource Include="Assets\Aukronome.ico" />
-    <Resource Include="Assets\Aukronome.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="NAudio" Version="2.2.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Aukronome.Core\Aukronome.Core.csproj" />
-  </ItemGroup>
-
-</Project>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>Aukronome</AssemblyName>
+    <RootNamespace>Aukronome.App</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <ApplicationIcon>Assets\Aukronome.ico</ApplicationIcon>
+    <Version>1.0.1</Version>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Aukronome.ico" />
+    <Resource Include="Assets\Aukronome.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Aukronome.Core\Aukronome.Core.csproj" />
+  </ItemGroup>
+
+</Project>

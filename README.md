@@ -39,7 +39,7 @@ Designed for solo musicians, music teachers, and rhythm practice, Aukronome mixe
 ### Option 1: Windows Graphical Setup Installer (Recommended — No CMD Needed)
 For everyday musicians and users who want to install and use Aukronome without opening a terminal:
 
-1. Download **`Aukronome-Setup-v1.0.0.exe`** (from [GitHub Releases](https://github.com/aukabanana/Aukronome/releases) or build it below).
+1. Download **`Aukronome-Setup-v1.0.1.exe`** (from [GitHub Releases](https://github.com/aukabanana/Aukronome/releases) or build it below).
 2. Double-click the `.exe` to open the setup wizard.
 3. Click **Next > Install**:
    - **No administrator privileges or UAC prompts required** (installs to `%LocalAppData%\Programs\Aukronome`).
@@ -48,7 +48,7 @@ For everyday musicians and users who want to install and use Aukronome without o
    - Adds a clean uninstaller in Windows Settings (*Apps > Installed apps*).
 
 > **To build the installer locally without typing commands:**
-> Simply double-click **`Build-Installer.bat`** in the repository root. It compiles the single-file binary, packages the installer using Inno Setup, and outputs `installer\output\Aukronome-Setup-v1.0.0.exe`.
+> Simply double-click **`Build-Installer.bat`** in the repository root. It compiles the single-file binary, packages the installer using Inno Setup, and outputs `installer\output\Aukronome-Setup-v1.0.1.exe`.
 
 ---
 
@@ -184,7 +184,7 @@ Aukronome/
 │   └── DESIGN_SYSTEM.md         # RawBlock brutalist UI design system specification
 ├── installer/
 │   ├── Aukronome.iss            # Inno Setup 6 compiler script
-│   └── output/                  # Compiled Aukronome-Setup-v1.0.0.exe
+│   └── output/                  # Compiled Aukronome-Setup-v1.0.1.exe
 ├── src/
 │   ├── Aukronome.Core/          # Audio engine, sound synthesis, models, persistence
 │   │   ├── Audio/               # MetronomeAudioEngine, MetronomeSampleProvider, SoundSynthesizer
