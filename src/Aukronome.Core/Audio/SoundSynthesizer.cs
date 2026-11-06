@@ -77,7 +77,7 @@ public static class SoundSynthesizer
             SoundType.Mechanical => new SynthesizedSoundBank(
                 soundType,
                 sampleRate,
-                SynthesizeMechanicalAccent(sampleRate, peakGain: 0.95f),
+                SynthesizeMechanicalAccent(sampleRate, peakGain: 0.80f),
                 SynthesizeMechanicalNormal(sampleRate, peakGain: 0.78f),
                 SynthesizeMechanicalSubdivision(sampleRate, peakGain: 0.54f)),
 
@@ -284,40 +284,40 @@ public static class SoundSynthesizer
 
     private static float[] SynthesizeMechanicalAccent(int sampleRate, float peakGain)
     {
-        // Authentic mechanical downbeat bell chime + escapement strike (~150 ms)
-        float durationSec = 0.150f;
+        // Warm acoustic mechanical downbeat bell chime + wooden body clack (~120 ms)
+        // Mellow, rounded brass bell without piercing or harsh high-frequency shrieks
+        float durationSec = 0.120f;
         int length = Math.Max(16, (int)(sampleRate * durationSec));
         var buffer = new float[length];
 
-        // Escapement base click
-        float[] escapement = SynthesizeMechanicalNormal(sampleRate, peakGain: 0.70f);
+        // Escapement wooden body click
+        float[] escapement = SynthesizeMechanicalNormal(sampleRate, peakGain: 0.72f);
 
-        // Bell frequencies: C7 (2093 Hz) + high octave (4186 Hz) + inharmonic overtone (5920 Hz)
-        const double fBell1 = 2093.0;
-        const double fBell2 = 4186.0;
-        const double fBell3 = 5920.0;
-        int strikeSamples = Math.Max(2, (int)(sampleRate * 0.004f));
+        // Warm bell fundamental at 988 Hz (B5) and gentle 2nd harmonic at 1976 Hz (B6)
+        // Kept strictly below 2 kHz to prevent ear fatigue and harsh treble piercing
+        const double fBell1 = 987.77;
+        const double fBell2 = 1975.53;
+        int strikeSamples = Math.Max(2, (int)(sampleRate * 0.003f));
 
         for (int i = 0; i < length; i++)
         {
             double t = (double)i / sampleRate;
             double wood = (i < escapement.Length) ? escapement[i] : 0.0;
 
-            // Metallic hammer strike transient
+            // Soft felt/brass hammer tap (gentle 1800 Hz transient instead of harsh 4800 Hz)
             double strike = (i < strikeSamples)
-                ? Math.Sin(2.0 * Math.PI * 4800.0 * t) * Math.Exp(-t * 550.0) * 0.35
+                ? Math.Sin(2.0 * Math.PI * 1800.0 * t) * Math.Exp(-t * 400.0) * 0.18
                 : 0.0;
 
-            // Resonant bell chime ringing
-            double env1 = Math.Exp(-t * 26.0);  // fundamental chime sustain
-            double env2 = Math.Exp(-t * 52.0);  // 2nd harmonic
-            double env3 = Math.Exp(-t * 110.0); // high inharmonic ring
+            // Smooth musical chime decay
+            double env1 = Math.Exp(-t * 22.0);
+            double env2 = Math.Exp(-t * 46.0);
 
-            double bell = (Math.Sin(2.0 * Math.PI * fBell1 * t) * 0.70 * env1)
-                        + (Math.Sin(2.0 * Math.PI * fBell2 * t) * 0.28 * env2)
-                        + (Math.Sin(2.0 * Math.PI * fBell3 * t) * 0.16 * env3);
+            double bell = (Math.Sin(2.0 * Math.PI * fBell1 * t) * 0.65 * env1)
+                        + (Math.Sin(2.0 * Math.PI * fBell2 * t) * 0.20 * env2);
 
-            buffer[i] = (float)(wood * 0.45 + (bell + strike) * 0.85);
+            // Rich wooden body carries the beat, with the mellow brass bell providing pleasant color
+            buffer[i] = (float)(wood * 0.65 + (bell + strike) * 0.40);
         }
 
         NormalizeInPlace(buffer, peakGain);
